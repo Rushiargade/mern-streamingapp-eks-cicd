@@ -1,11 +1,11 @@
 FROM node:18-alpine AS base
 
-WORKDIR /app
+WORKDIR /app/authService
 
-COPY package*.json ./
+COPY authService/package*.json ./
 RUN npm install --production
 
-COPY . .
+COPY authService/. ./
 
 ENV NODE_ENV=production
 EXPOSE 3001
