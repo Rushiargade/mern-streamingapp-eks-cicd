@@ -3,12 +3,6 @@ pipeline {
 
     stages {
 
-        stage('Clone Repository') {
-            steps {
-                git 'https://github.com/Rushiargade/mern-streamingapp-eks-cicd.git'
-            }
-        }
-
         stage('Build Backend Images') {
             steps {
                 sh '''
