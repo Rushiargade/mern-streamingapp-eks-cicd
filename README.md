@@ -1,138 +1,242 @@
-# StreamingApp
 
-Stream premium video content, host live watch parties, and manage your catalogue with a modern microservice architecture. The platform now ships with a production-ready admin portal, real-time chat, S3-backed adaptive streaming, and a redesigned cinematic frontend experience.
+# MERN Streaming Application – DevOps Orchestration Project
 
-## Architecture
+## Project Overview
 
-| Service | Port | Description |
-| --- | --- | --- |
-| `authService` | 3001 | User authentication, registration, JWT issuance |
-| `streamingService` | 3002 | Video catalogue, S3 playback endpoints, public APIs |
-| `adminService` | 3003 | Dedicated admin microservice for asset management and uploads |
-| `chatService` | 3004 | Websocket + REST chat for live watch parties |
-| `frontend` | 3000 | React SPA with revamped UI and integrated chat |
-| `mongo` | 27017 | Shared MongoDB instance |
+This project demonstrates a **DevOps workflow for deploying a MERN microservices application** using containerization, CI/CD, and Kubernetes orchestration.
 
-All backend services share common database models and utilities through `backend/common`.
+The system consists of multiple backend microservices, a React frontend, and a MongoDB database. Each component runs inside its own Docker container and is orchestrated locally using Docker Compose.
 
-## Environment Configuration
+The project will later extend to:
 
-Create an `.env` for each service (or export variables before running). All services accept the standard AWS credentials for S3 access.
+* Jenkins CI/CD pipelines
+* AWS ECR image registry
+* Kubernetes deployment (EKS)
+* Helm charts for application packaging
+* Monitoring and logging
 
-### Auth Service (`backend/authService/.env`)
-```ini
-PORT=3001
-MONGO_URI=mongodb://localhost:27017/streamingapp
-JWT_SECRET=changeme
-CLIENT_URLS=http://localhost:3000
-AWS_ACCESS_KEY_ID=
-AWS_SECRET_ACCESS_KEY=
-AWS_REGION=ap-south-1
-AWS_S3_BUCKET=
+---
+
+# Application Architecture
+
+The application follows a **microservices architecture**.
+
+| Service           | Port  | Description                           |
+| ----------------- | ----- | ------------------------------------- |
+| Auth Service      | 3001  | User authentication and JWT handling  |
+| Streaming Service | 3002  | Video catalogue and playback APIs     |
+| Admin Service     | 3003  | Admin operations and asset management |
+| Chat Service      | 3004  | Real-time chat for watch parties      |
+| Frontend          | 3000  | React single page application         |
+| MongoDB           | 27017 | Shared database                       |
+
+Each backend service connects to the same MongoDB instance.
+
+---
+
+# Technology Stack
+
+### Backend
+
+* Node.js
+* Express.js
+* MongoDB
+* Mongoose
+
+### Frontend
+
+* React.js
+
+### DevOps Tools
+
+* Docker
+* Docker Compose
+* Git / GitHub
+
+Future integration:
+
+* Jenkins
+* AWS ECR
+* Kubernetes (EKS)
+* Helm
+* CloudWatch Monitoring
+
+---
+
+# Repository Structure
+
+```
+mern-streamingapp-eks-cicd
+
+backend/
+│
+├── adminService
+├── authService
+├── chatService
+└── streamingService
+
+frontend/
+│
+├── src
+├── public
+└── Dockerfile
+
+docker-compose.yml
+README.md
 ```
 
-### Streaming Service (`backend/streamingService/.env`)
-```ini
-PORT=3002
-MONGO_URI=mongodb://localhost:27017/streamingapp
-JWT_SECRET=changeme
-CLIENT_URLS=http://localhost:3000
-AWS_ACCESS_KEY_ID=
-AWS_SECRET_ACCESS_KEY=
-AWS_REGION=ap-south-1
-AWS_S3_BUCKET=
-AWS_CDN_URL=
-STREAMING_PUBLIC_URL=http://localhost:3002
+---
+
+# Step 1 – Clone the Repository
+
+```
+git clone https://github.com/Rushiargade/mern-streamingapp-eks-cicd.git
+cd mern-streamingapp-eks-cicd
 ```
 
-### Admin Service (`backend/adminService/.env`)
-```ini
-PORT=3003
-MONGO_URI=mongodb://localhost:27017/streamingapp
-JWT_SECRET=changeme
-CLIENT_URLS=http://localhost:3000
-AWS_ACCESS_KEY_ID=
-AWS_SECRET_ACCESS_KEY=
-AWS_REGION=ap-south-1
-AWS_S3_BUCKET=
+---
+
+# Step 2 – Build Backend Docker Images
+
+Navigate to the backend directory and build each microservice image.
+
+```
+cd backend
+
+docker build -t admin-service -f adminService/Dockerfile .
+docker build -t auth-service -f authService/Dockerfile .
+docker build -t streaming-service -f streamingService/Dockerfile .
+docker build -t chat-service -f chatService/Dockerfile .
 ```
 
-### Chat Service (`backend/chatService/.env`)
-```ini
-PORT=3004
-MONGO_URI=mongodb://localhost:27017/streamingapp
-JWT_SECRET=changeme
-CLIENT_URLS=http://localhost:3000
+Verify images:
+
+```
+docker images
 ```
 
-### Frontend build variables (`frontend/.env` or Docker build args)
-```ini
-REACT_APP_AUTH_API_URL=http://localhost:3001/api
-REACT_APP_STREAMING_API_URL=http://localhost:3002/api
-REACT_APP_STREAMING_PUBLIC_URL=http://localhost:3002
-REACT_APP_ADMIN_API_URL=http://localhost:3003/api/admin
-REACT_APP_CHAT_API_URL=http://localhost:3004/api/chat
-REACT_APP_CHAT_SOCKET_URL=http://localhost:3004
+---
+
+# Step 3 – Build Frontend Image
+
+Navigate to the frontend folder.
+
+```
+cd ../frontend
 ```
 
-## Running with Docker Compose
+Build the frontend container.
 
-1. Populate the environment variables above (or rely on the defaults baked into `docker-compose.yml`).
-2. Build and start the stack:
-   ```bash
-   docker-compose up --build
-   ```
-3. Navigate to `http://localhost:3000` for the web app.
-
-The compose file provisions MongoDB plus all four Node.js microservices. S3 credentials are optional for local testing—you can still browse seeded metadata, but streaming requires valid S3 objects.
-
-## Local Development
-
-Install dependencies for each service:
-
-```bash
-# auth service
-cd backend/authService && npm install
-
-# streaming service
-cd ../streamingService && npm install
-
-# admin service
-cd ../adminService && npm install
-
-# chat service
-cd ../chatService && npm install
-
-# frontend
-cd ../../frontend && npm install
+```
+docker build -t frontend-service .
 ```
 
-Run the services (in separate terminals) after starting MongoDB:
+---
 
-```bash
-cd backend/authService && npm run dev
-cd backend/streamingService && npm run dev
-cd backend/adminService && npm run dev
-cd backend/chatService && npm run dev
-cd frontend && npm start
+# Step 4 – Start the Application Using Docker Compose
+
+From the project root directory:
+
+```
+docker-compose up -d
 ```
 
-## Feature Highlights
+This command starts:
 
-- **S3-backed adaptive streaming** with secure signed uploads for admins.
-- **Dedicated admin microservice** for video ingestion, metadata management, and featured curation.
-- **Real-time chat** overlay in the player (Socket.IO + persistent message history).
-- **Modern React experience** featuring cinematic hero sections, dynamic carousels, and responsive design.
-- **Role-aware access control** across frontend routes and backend microservices.
+* MongoDB container
+* Auth Service
+* Streaming Service
+* Admin Service
+* Chat Service
+* Frontend container
 
-## Testing
+---
 
-Automated tests are not yet included. Recommended smoke checks:
+# Step 5 – Verify Running Containers
 
-1. Register and log in through the web UI.
-2. Upload a small video + thumbnail via the admin dashboard (requires valid S3 credentials).
-3. Confirm playback from the browse page and verify that chat messages broadcast between multiple browser tabs.
+```
+docker ps
+```
 
-## License
+Expected running containers:
 
-MIT © StreamFlix Team
+```
+mongo
+auth-service
+streaming-service
+admin-service
+chat-service
+frontend
+```
+
+---
+
+# Step 6 – Access the Application
+
+Frontend UI:
+
+```
+http://localhost:3000
+```
+
+Backend APIs:
+
+```
+http://localhost:3001
+http://localhost:3002
+http://localhost:3003
+http://localhost:3004
+```
+
+---
+
+# Docker Networking
+
+Docker Compose automatically creates a shared network where containers communicate using service names.
+
+Example Mongo connection used in services:
+
+```
+mongodb://mongo:27017/streamingapp
+```
+
+---
+
+# DevOps Implementation Progress
+
+Completed:
+
+* Repository fork and setup
+* Microservices architecture analysis
+* Dockerization of backend services
+* Frontend containerization
+* Docker Compose orchestration
+* Local testing of all services
+
+Pending DevOps stages:
+
+1. Jenkins CI pipeline
+2. Docker image push to AWS ECR
+3. Kubernetes deployment (EKS)
+4. Helm chart packaging
+5. Monitoring and logging setup
+6. ChatOps integration
+
+---
+
+# Future Architecture
+
+Final pipeline will follow this flow:
+
+```
+Developer → GitHub → Jenkins CI → Build Docker Images
+→ Push to AWS ECR → Deploy to Kubernetes (EKS)
+→ Monitor using CloudWatch
+```
+
+---
+
+# Author
+
+Rushikesh Argade
+Cloud / DevOps Engineer
