@@ -1,7 +1,7 @@
-
-version: '3.8'
+version: "3.8"
 
 services:
+
   mongo:
     image: mongo:6
     container_name: mongo
@@ -15,10 +15,10 @@ services:
     image: auth-service
     container_name: auth-service
     restart: always
-    environment:
-      - MONGO_URI=mongodb://mongo:27017/streamingapp
     ports:
       - "3001:3001"
+    environment:
+      - MONGO_URI=mongodb://mongo:27017/streamingapp
     depends_on:
       - mongo
 
@@ -26,10 +26,10 @@ services:
     image: streaming-service
     container_name: streaming-service
     restart: always
-    environment:
-      - MONGO_URI=mongodb://mongo:27017/streamingapp
     ports:
       - "3002:3002"
+    environment:
+      - MONGO_URI=mongodb://mongo:27017/streamingapp
     depends_on:
       - mongo
 
@@ -37,10 +37,10 @@ services:
     image: admin-service
     container_name: admin-service
     restart: always
-    environment:
-      - MONGO_URI=mongodb://mongo:27017/streamingapp
     ports:
       - "3003:3003"
+    environment:
+      - MONGO_URI=mongodb://mongo:27017/streamingapp
     depends_on:
       - mongo
 
@@ -48,10 +48,10 @@ services:
     image: chat-service
     container_name: chat-service
     restart: always
-    environment:
-      - MONGO_URI=mongodb://mongo:27017/streamingapp
     ports:
       - "3004:3004"
+    environment:
+      - MONGO_URI=mongodb://mongo:27017/streamingapp
     depends_on:
       - mongo
 
@@ -60,7 +60,7 @@ services:
     container_name: frontend
     restart: always
     ports:
-      - "3000:3000"
+      - "3000:80"
     depends_on:
       - auth-service
       - streaming-service
