@@ -305,3 +305,25 @@ Kubernetes Cluster (Minikube)
 
 This architecture enables containerized microservices to run in a scalable Kubernetes environment.
 
+
+Helm Deployment
+
+The Kubernetes manifests were packaged into a Helm chart to simplify deployment and manage application releases.
+
+Helm chart structure:
+
+streaming-app/
+  Chart.yaml
+  values.yaml
+  templates/
+      mongo.yaml
+      auth.yaml
+      streaming.yaml
+      admin.yaml
+      chat.yaml
+      frontend.yaml
+
+Deploy application:
+
+helm install streaming-app ./streaming-app
+
